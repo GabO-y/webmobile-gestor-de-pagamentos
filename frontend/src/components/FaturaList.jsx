@@ -4,9 +4,9 @@ const statusEstilos = {
   ATRASADO: 'bg-red-100 text-red-700',
 }
 
-export default function FaturaList({ faturas, onDeletar }) {
+export default function FaturaList({ faturas, onDeletar, onClick }) {
   return (
-    <div className="mt-6 space-y-3">
+    <div className="space-y-3">
       {faturas.length === 0 && (
         <p className="text-gray-500 text-center py-8 bg-white rounded-xl border border-dashed border-gray-300">
           Nenhuma fatura cadastrada.
@@ -15,7 +15,8 @@ export default function FaturaList({ faturas, onDeletar }) {
       {faturas.map((fatura) => (
         <div
           key={fatura.id}
-          className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex justify-between items-center hover:shadow-md transition"
+          onClick={() => onClick(fatura)}
+          className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex justify-between items-center hover:shadow-md transition cursor-pointer"
         >
           <div className="space-y-1">
             <p className="font-semibold text-gray-800">
@@ -29,7 +30,7 @@ export default function FaturaList({ faturas, onDeletar }) {
             </span>
           </div>
           <button
-            onClick={() => onDeletar(fatura.id)}
+            onClick={(e) => { e.stopPropagation(); onDeletar(fatura.id) }}
             className="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition text-sm font-medium"
           >
             Remover

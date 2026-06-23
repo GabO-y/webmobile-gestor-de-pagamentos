@@ -9,6 +9,9 @@ export default function Clientes() {
   const [clientes, setClientes] = useState([])
   const [carregando, setCarregando] = useState(true)
   const [sidebarAberta, setSidebarAberta] = useState(false)
+  const [selecionado, setSelecionado] = useState(null)
+  const [editando, setEditando] = useState(false)
+  const [formEdit, setFormEdit] = useState({ nome: '', email: '', telefone: '' })
   const [toast, setToast] = useState({ mensagem: '', tipo: '' })
 
   const mostrarToast = useCallback((mensagem, tipo) => {
@@ -42,10 +45,38 @@ export default function Clientes() {
     try {
       await api.delete(`/clientes/${id}`)
       mostrarToast('Cliente removido com sucesso!', 'sucesso')
+      if (selecionado?.id === id) setSelecionado(null)
       carregar()
     } catch {
       mostrarToast('Erro ao remover cliente', 'erro')
     }
+  }
+
+  async function atualizar(id, dados) {
+    try {
+      await api.put(`/clientes/${id}`, dados)
+      mostrarToast('Cliente atualizado com sucesso!', 'sucesso')
+      setSelecionado(null)
+      setEditando(false)
+      carregar()
+    } catch {
+      mostrarToast('Erro ao atualizar cliente', 'erro')
+    }
+  }
+
+  function abrirDetalhes(cliente) {
+    setSelecionado(cliente)
+    setFormEdit({ nome: cliente.nome, email: cliente.email, telefone: cliente.telefone || '' })
+    setEditando(false)
+  }
+
+  function handleEditChange(e) {
+    setFormEdit({ ...formEdit, [e.target.name]: e.target.value })
+  }
+
+  function handleEditSubmit(e) {
+    e.preventDefault()
+    atualizar(selecionado.id, formEdit)
   }
 
   useEffect(() => {
@@ -63,7 +94,7 @@ export default function Clientes() {
       {carregando ? (
         <p className="text-center text-gray-500 mt-8">Carregando...</p>
       ) : (
-        <ClienteList clientes={clientes} onDeletar={deletar} />
+        <ClienteList clientes={clientes} onDeletar={deletar} onClick={abrirDetalhes} />
       )}
 
       <button
@@ -75,6 +106,88 @@ export default function Clientes() {
 
       <Modal aberta={sidebarAberta} onFechar={() => setSidebarAberta(false)} titulo="Novo Cliente">
         <ClienteForm onSalvar={salvar} />
+      </Modal>
+
+      <Modal aberta={!!selecionado} onFechar={() => { setSelecionado(null); setEditando(false) }} titulo="Detalhes do Cliente">
+        {selecionado && !editando && (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-500 mb-1">Nome</label>
+              <p className="text-gray-800 font-medium">{selecionado.nome}</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-500 mb-1">Email</label>
+              <p className="text-gray-800">{selecionado.email}</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-500 mb-1">Telefone</label>
+              <p className="text-gray-800">{selecionado.telefone || '—'}</p>
+            </div>
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={() => setEditando(true)}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg p-2.5 transition cursor-pointer"
+              >
+                Editar
+              </button>
+              <button
+                onClick={() => deletar(selecionado.id)}
+                className="flex-1 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg p-2.5 transition cursor-pointer"
+              >
+                Remover
+              </button>
+            </div>
+          </div>
+        )}
+        {selecionado && editando && (
+          <form onSubmit={handleEditSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Nome</label>
+              <input
+                name="nome"
+                value={formEdit.nome}
+                onChange={handleEditChange}
+                className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Email</label>
+              <input
+                name="email"
+                value={formEdit.email}
+                onChange={handleEditChange}
+                type="email"
+                className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Telefone</label>
+              <input
+                name="telefone"
+                value={formEdit.telefone}
+                onChange={handleEditChange}
+                className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+              />
+            </div>
+            <div className="flex gap-3 pt-2">
+              <button
+                type="submit"
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg p-2.5 transition cursor-pointer"
+              >
+                Salvar
+              </button>
+              <button
+                type="button"
+                onClick={() => setEditando(false)}
+                className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg p-2.5 transition cursor-pointer"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        )}
       </Modal>
     </div>
   )

@@ -18,7 +18,6 @@ export default function Login() {
       const response = await api.post('/auth/login', form)
       const token = response.data.token
       localStorage.setItem('token', token)
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`
       navigate('/clientes')
     } catch {
       setErro('Email ou senha invalidos')

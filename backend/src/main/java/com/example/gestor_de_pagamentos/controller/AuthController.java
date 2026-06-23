@@ -3,6 +3,7 @@ package com.example.gestor_de_pagamentos.controller;
 import com.example.gestor_de_pagamentos.config.JwtUtil;
 import com.example.gestor_de_pagamentos.dto.LoginRequest;
 import com.example.gestor_de_pagamentos.dto.LoginResponse;
+import com.example.gestor_de_pagamentos.dto.RegisterRequest;
 import com.example.gestor_de_pagamentos.model.Usuario;
 import com.example.gestor_de_pagamentos.repository.UsuarioRepository;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,23 @@ public class AuthController {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<LoginResponse> register(@RequestBody RegisterRequest request) {
+        if (usuarioRepository.findByEmail(request.email()).isPresent()) {
+            throw new RuntimeException("Email ja cadastrado");
+        }
+
+        Usuario usuario = new Usuario();
+        usuario.setNome(request.nome());
+        usuario.setEmail(request.email());
+        usuario.setSenha(passwordEncoder.encode(request.senha()));
+
+        usuarioRepository.save(usuario);
+
+        String token = jwtUtil.gerarToken(usuario);
+        return ResponseEntity.ok(new LoginResponse(token));
     }
 
     @PostMapping("/login")

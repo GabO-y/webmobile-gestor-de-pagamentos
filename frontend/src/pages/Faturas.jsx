@@ -5,20 +5,35 @@ import FaturaList from '../components/FaturaList'
 
 export default function Faturas() {
   const [faturas, setFaturas] = useState([])
+  const [erro, setErro] = useState('')
 
   async function carregar() {
-    const response = await api.get('/faturas')
-    setFaturas(response.data)
+    try {
+      const response = await api.get('/faturas')
+      setFaturas(response.data)
+    } catch {
+      setErro('Erro ao carregar faturas')
+    }
   }
 
   async function salvar(dados) {
-    await api.post('/faturas', dados)
-    carregar()
+    try {
+      await api.post('/faturas', dados)
+      setErro('')
+      carregar()
+    } catch {
+      setErro('Erro ao salvar fatura')
+    }
   }
 
   async function deletar(id) {
-    await api.delete(`/faturas/${id}`)
-    carregar()
+    try {
+      await api.delete(`/faturas/${id}`)
+      setErro('')
+      carregar()
+    } catch {
+      setErro('Erro ao remover fatura')
+    }
   }
 
   useEffect(() => {
@@ -28,6 +43,7 @@ export default function Faturas() {
   return (
     <div className="max-w-2xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">Faturas</h1>
+      {erro && <p className="text-red-500 text-sm mb-2">{erro}</p>}
       <FaturaForm onSalvar={salvar} />
       <FaturaList faturas={faturas} onDeletar={deletar} />
     </div>

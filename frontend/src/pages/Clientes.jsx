@@ -5,20 +5,35 @@ import ClienteList from '../components/ClienteList'
 
 export default function Clientes() {
   const [clientes, setClientes] = useState([])
+  const [erro, setErro] = useState('')
 
   async function carregar() {
-    const response = await api.get('/clientes')
-    setClientes(response.data)
+    try {
+      const response = await api.get('/clientes')
+      setClientes(response.data)
+    } catch {
+      setErro('Erro ao carregar clientes')
+    }
   }
 
   async function salvar(dados) {
-    await api.post('/clientes', dados)
-    carregar()
+    try {
+      await api.post('/clientes', dados)
+      setErro('')
+      carregar()
+    } catch {
+      setErro('Erro ao salvar cliente')
+    }
   }
 
   async function deletar(id) {
-    await api.delete(`/clientes/${id}`)
-    carregar()
+    try {
+      await api.delete(`/clientes/${id}`)
+      setErro('')
+      carregar()
+    } catch {
+      setErro('Erro ao remover cliente')
+    }
   }
 
   useEffect(() => {
@@ -28,6 +43,7 @@ export default function Clientes() {
   return (
     <div className="max-w-2xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">Clientes</h1>
+      {erro && <p className="text-red-500 text-sm mb-2">{erro}</p>}
       <ClienteForm onSalvar={salvar} />
       <ClienteList clientes={clientes} onDeletar={deletar} />
     </div>

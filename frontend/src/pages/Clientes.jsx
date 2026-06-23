@@ -2,11 +2,13 @@ import { useEffect, useState, useCallback } from 'react'
 import api from '../api/axios'
 import ClienteForm from '../components/ClienteForm'
 import ClienteList from '../components/ClienteList'
+import Modal from '../components/Modal'
 import Toast from '../components/Toast'
 
 export default function Clientes() {
   const [clientes, setClientes] = useState([])
   const [carregando, setCarregando] = useState(true)
+  const [sidebarAberta, setSidebarAberta] = useState(false)
   const [toast, setToast] = useState({ mensagem: '', tipo: '' })
 
   const mostrarToast = useCallback((mensagem, tipo) => {
@@ -29,6 +31,7 @@ export default function Clientes() {
     try {
       await api.post('/clientes', dados)
       mostrarToast('Cliente cadastrado com sucesso!', 'sucesso')
+      setSidebarAberta(false)
       carregar()
     } catch {
       mostrarToast('Erro ao salvar cliente', 'erro')
@@ -53,13 +56,26 @@ export default function Clientes() {
   return (
     <div className="max-w-2xl mx-auto px-4">
       <Toast mensagem={toast.mensagem} tipo={toast.tipo} onFechar={() => setToast({ mensagem: '', tipo: '' })} />
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Clientes</h1>
-      <ClienteForm onSalvar={salvar} />
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">Clientes</h1>
+        <span className="text-sm text-gray-500">{clientes.length} cliente(s)</span>
+      </div>
       {carregando ? (
         <p className="text-center text-gray-500 mt-8">Carregando...</p>
       ) : (
         <ClienteList clientes={clientes} onDeletar={deletar} />
       )}
+
+      <button
+        onClick={() => setSidebarAberta(true)}
+        className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-3xl transition hover:scale-110 z-30 cursor-pointer"
+      >
+        +
+      </button>
+
+      <Modal aberta={sidebarAberta} onFechar={() => setSidebarAberta(false)} titulo="Novo Cliente">
+        <ClienteForm onSalvar={salvar} />
+      </Modal>
     </div>
   )
 }

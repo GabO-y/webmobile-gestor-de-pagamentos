@@ -13,6 +13,7 @@ export default function FaturaForm({ onSalvar }) {
     status: 'PENDENTE',
   })
   const [clientes, setClientes] = useState([])
+  const [erro, setErro] = useState('')
 
   useEffect(() => {
     api.get('/clientes').then((response) => setClientes(response.data))
@@ -24,6 +25,11 @@ export default function FaturaForm({ onSalvar }) {
 
   function handleSubmit(e) {
     e.preventDefault()
+    setErro('')
+    if (!form.vencimento) {
+      setErro('Selecione uma data de vencimento')
+      return
+    }
     const ano = form.vencimento.getFullYear()
     const mes = String(form.vencimento.getMonth() + 1).padStart(2, '0')
     const dia = String(form.vencimento.getDate()).padStart(2, '0')
@@ -94,6 +100,7 @@ export default function FaturaForm({ onSalvar }) {
           <option value="ATRASADO">Atrasado</option>
         </select>
       </div>
+      {erro && <p className="text-red-500 text-sm">{erro}</p>}
       <button
         type="submit"
         className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg p-2.5 transition cursor-pointer"

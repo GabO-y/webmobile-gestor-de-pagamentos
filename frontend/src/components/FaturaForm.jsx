@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react'
+import DatePicker, { registerLocale } from 'react-datepicker'
+import { ptBR } from 'date-fns/locale'
 import api from '../api/axios'
+
+registerLocale('pt-BR', ptBR)
 
 export default function FaturaForm({ onSalvar }) {
   const [form, setForm] = useState({
     clienteId: '',
     valor: '',
-    vencimento: '',
+    vencimento: null,
     status: 'PENDENTE',
   })
   const [clientes, setClientes] = useState([])
@@ -20,13 +24,16 @@ export default function FaturaForm({ onSalvar }) {
 
   function handleSubmit(e) {
     e.preventDefault()
+    const ano = form.vencimento.getFullYear()
+    const mes = String(form.vencimento.getMonth() + 1).padStart(2, '0')
+    const dia = String(form.vencimento.getDate()).padStart(2, '0')
     onSalvar({
       cliente: { id: Number(form.clienteId) },
       valor: Number(form.valor),
-      vencimento: form.vencimento,
+      vencimento: `${ano}-${mes}-${dia}`,
       status: form.status,
     })
-    setForm({ clienteId: '', valor: '', vencimento: '', status: 'PENDENTE' })
+    setForm({ clienteId: '', valor: '', vencimento: null, status: 'PENDENTE' })
   }
 
   return (
@@ -64,14 +71,15 @@ export default function FaturaForm({ onSalvar }) {
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-600 mb-1">Vencimento</label>
-        <input
-          name="vencimento"
-          value={form.vencimento}
-          onChange={handleChange}
-          type="date"
-          className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-          required
-        />
+        <div className="w-full flex justify-center">
+          <DatePicker
+            selected={form.vencimento}
+            onChange={(date) => setForm({ ...form, vencimento: date })}
+            dateFormat="dd/MM/yyyy"
+            locale="pt-BR"
+            inline
+          />
+        </div>
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-600 mb-1">Status</label>

@@ -6,6 +6,7 @@ import FaturaForm from '../components/FaturaForm'
 import FaturaList from '../components/FaturaList'
 import Modal from '../components/Modal'
 import Toast from '../components/Toast'
+import { parseDate, formatDate, formatDateBR } from '../utils/date'
 
 registerLocale('pt-BR', ptBR)
 
@@ -86,7 +87,7 @@ export default function Faturas() {
     setFormEdit({
       clienteId: fatura.cliente?.id || '',
       valor: fatura.valor,
-      vencimento: new Date(fatura.vencimento),
+      vencimento: parseDate(fatura.vencimento),
       status: fatura.status,
     })
     setEditando(false)
@@ -99,13 +100,10 @@ export default function Faturas() {
   function handleEditSubmit(e) {
     e.preventDefault()
     if (!formEdit.vencimento) return
-    const ano = formEdit.vencimento.getFullYear()
-    const mes = String(formEdit.vencimento.getMonth() + 1).padStart(2, '0')
-    const dia = String(formEdit.vencimento.getDate()).padStart(2, '0')
     atualizar(selecionado.id, {
       cliente: { id: Number(formEdit.clienteId) },
       valor: Number(formEdit.valor),
-      vencimento: `${ano}-${mes}-${dia}`,
+      vencimento: formatDate(formEdit.vencimento),
       status: formEdit.status,
     })
   }
@@ -158,7 +156,7 @@ export default function Faturas() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-500 mb-1">Vencimento</label>
-              <p className="text-gray-800">{new Date(selecionado.vencimento).toLocaleDateString('pt-BR')}</p>
+              <p className="text-gray-800">{formatDateBR(selecionado.vencimento)}</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-500 mb-1">Status</label>

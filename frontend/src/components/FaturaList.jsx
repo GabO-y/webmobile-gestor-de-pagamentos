@@ -1,3 +1,5 @@
+import { formatDateBR } from '../utils/date'
+
 const statusEstilos = {
   PENDENTE: 'bg-yellow-100 text-yellow-700',
   PAGO: 'bg-green-100 text-green-700',
@@ -23,7 +25,7 @@ export default function FaturaList({ faturas, onDeletar, onClick }) {
               R$ {Number(fatura.valor).toFixed(2).replace('.', ',')}
             </p>
             <p className="text-sm text-gray-500">
-              Vencimento: {new Date(fatura.vencimento).toLocaleDateString('pt-BR')}
+              Vencimento: {formatDateBR(fatura.vencimento)}
             </p>
             <span className={`inline-block text-xs font-medium px-2.5 py-0.5 rounded-full ${statusEstilos[fatura.status] || 'bg-gray-100 text-gray-700'}`}>
               {fatura.status}

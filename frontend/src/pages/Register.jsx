@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import api from '../api/axios'
 
-export default function Login() {
-  const [form, setForm] = useState({ email: '', senha: '' })
+export default function Register() {
+  const [form, setForm] = useState({ nome: '', email: '', senha: '' })
   const [erro, setErro] = useState('')
   const navigate = useNavigate()
 
@@ -15,20 +15,28 @@ export default function Login() {
     e.preventDefault()
     setErro('')
     try {
-      const response = await api.post('/auth/login', form)
+      const response = await api.post('/auth/register', form)
       const token = response.data.token
       localStorage.setItem('token', token)
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`
       navigate('/clientes')
     } catch {
-      setErro('Email ou senha invalidos')
+      setErro('Erro ao cadastrar. Verifique os dados.')
     }
   }
 
   return (
     <div className="max-w-md mx-auto mt-20 p-6">
-      <h1 className="text-2xl font-bold mb-4 text-center">Login</h1>
+      <h1 className="text-2xl font-bold mb-4 text-center">Criar Conta</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+        <input
+          name="nome"
+          value={form.nome}
+          onChange={handleChange}
+          placeholder="Nome"
+          className="border rounded p-2"
+          required
+        />
         <input
           name="email"
           value={form.email}
@@ -52,11 +60,11 @@ export default function Login() {
           type="submit"
           className="bg-blue-600 text-white rounded p-2 hover:bg-blue-700"
         >
-          Entrar
+          Cadastrar
         </button>
       </form>
       <p className="text-center text-sm text-gray-500 mt-4">
-        Nao tem conta? <Link to="/register" className="text-blue-600 hover:underline">Cadastrar</Link>
+        Ja tem conta? <Link to="/login" className="text-blue-600 hover:underline">Entrar</Link>
       </p>
     </div>
   )

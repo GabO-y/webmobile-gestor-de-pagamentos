@@ -1,21 +1,28 @@
 export default function ClienteList({ clientes, onDeletar }) {
   return (
-    <div className="mt-6">
+    <div className="mt-6 space-y-3">
       {clientes.length === 0 && (
-        <p className="text-gray-500">Nenhum cliente cadastrado.</p>
+        <p className="text-gray-500 text-center py-8 bg-white rounded-xl border border-dashed border-gray-300">
+          Nenhum cliente cadastrado.
+        </p>
       )}
       {clientes.map((cliente) => (
         <div
           key={cliente.id}
-          className="flex justify-between items-center border rounded p-4 mb-2"
+          className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex justify-between items-center hover:shadow-md transition"
         >
-          <div>
-            <p className="font-semibold">{cliente.nome}</p>
-            <p className="text-sm text-gray-500">{cliente.email}</p>
+          <div className="flex items-center gap-3">
+            <div className="bg-blue-100 text-blue-600 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm">
+              {cliente.nome.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <p className="font-semibold text-gray-800">{cliente.nome}</p>
+              <p className="text-sm text-gray-500">{cliente.email}{cliente.telefone ? ` — ${cliente.telefone}` : ''}</p>
+            </div>
           </div>
           <button
             onClick={() => onDeletar(cliente.id)}
-            className="text-red-500 hover:text-red-700 text-sm"
+            className="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition text-sm font-medium"
           >
             Remover
           </button>

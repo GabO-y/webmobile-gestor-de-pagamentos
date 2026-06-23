@@ -16,8 +16,7 @@ export default function Login() {
     setErro('')
     try {
       const response = await api.post('/auth/login', form)
-      const token = response.data.token
-      localStorage.setItem('token', token)
+      localStorage.setItem('token', response.data.token)
       navigate('/clientes')
     } catch {
       setErro('Email ou senha invalidos')
@@ -25,38 +24,52 @@ export default function Login() {
   }
 
   return (
-    <div className="max-w-md mx-auto mt-20 p-6">
-      <h1 className="text-2xl font-bold mb-4 text-center">Login</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <input
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-          placeholder="Email"
-          type="email"
-          className="border rounded p-2"
-          required
-        />
-        <input
-          name="senha"
-          value={form.senha}
-          onChange={handleChange}
-          placeholder="Senha"
-          type="password"
-          className="border rounded p-2"
-          required
-        />
-        {erro && <p className="text-red-500 text-sm">{erro}</p>}
-        <button
-          type="submit"
-          className="bg-blue-600 text-white rounded p-2 hover:bg-blue-700"
-        >
-          Entrar
-        </button>
-      </form>
-      <p className="text-center text-sm text-gray-500 mt-4">
-        Nao tem conta? <Link to="/register" className="text-blue-600 hover:underline">Cadastrar</Link>
-      </p>
+    <div className="min-h-[80vh] flex items-center justify-center">
+      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md mx-4">
+        <div className="text-center mb-6">
+          <div className="bg-blue-600 text-white w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl font-bold">
+            G
+          </div>
+          <h1 className="text-2xl font-bold text-gray-800">Gestor de Pagamentos</h1>
+          <p className="text-gray-500 text-sm mt-1">Entre com sua conta</p>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              placeholder="seu@email.com"
+              type="email"
+              className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+            <input
+              name="senha"
+              value={form.senha}
+              onChange={handleChange}
+              placeholder="Sua senha"
+              type="password"
+              className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+              required
+            />
+          </div>
+          {erro && <p className="text-red-500 text-sm text-center">{erro}</p>}
+          <button
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg p-2.5 transition cursor-pointer"
+          >
+            Entrar
+          </button>
+        </form>
+        <p className="text-center text-sm text-gray-500 mt-4">
+          Nao tem conta? <Link to="/register" className="text-blue-600 hover:underline font-medium">Cadastrar</Link>
+        </p>
+      </div>
     </div>
   )
 }

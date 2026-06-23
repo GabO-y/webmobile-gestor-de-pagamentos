@@ -1,51 +1,65 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import api from '../api/axios'
 import FaturaForm from '../components/FaturaForm'
 import FaturaList from '../components/FaturaList'
+import Toast from '../components/Toast'
 
 export default function Faturas() {
   const [faturas, setFaturas] = useState([])
-  const [erro, setErro] = useState('')
+  const [carregando, setCarregando] = useState(true)
+  const [toast, setToast] = useState({ mensagem: '', tipo: '' })
+
+  const mostrarToast = useCallback((mensagem, tipo) => {
+    setToast({ mensagem, tipo })
+  }, [])
 
   async function carregar() {
     try {
+      setCarregando(true)
       const response = await api.get('/faturas')
       setFaturas(response.data)
     } catch {
-      setErro('Erro ao carregar faturas')
+      mostrarToast('Erro ao carregar faturas', 'erro')
+    } finally {
+      setCarregando(false)
     }
   }
 
   async function salvar(dados) {
     try {
       await api.post('/faturas', dados)
-      setErro('')
+      mostrarToast('Fatura cadastrada com sucesso!', 'sucesso')
       carregar()
     } catch {
-      setErro('Erro ao salvar fatura')
+      mostrarToast('Erro ao salvar fatura', 'erro')
     }
   }
 
   async function deletar(id) {
     try {
       await api.delete(`/faturas/${id}`)
-      setErro('')
+      mostrarToast('Fatura removida com sucesso!', 'sucesso')
       carregar()
     } catch {
-      setErro('Erro ao remover fatura')
+      mostrarToast('Erro ao remover fatura', 'erro')
     }
   }
 
   useEffect(() => {
     carregar()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4">Faturas</h1>
-      {erro && <p className="text-red-500 text-sm mb-2">{erro}</p>}
+    <div className="max-w-2xl mx-auto px-4">
+      <Toast mensagem={toast.mensagem} tipo={toast.tipo} onFechar={() => setToast({ mensagem: '', tipo: '' })} />
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">Faturas</h1>
       <FaturaForm onSalvar={salvar} />
-      <FaturaList faturas={faturas} onDeletar={deletar} />
+      {carregando ? (
+        <p className="text-center text-gray-500 mt-8">Carregando...</p>
+      ) : (
+        <FaturaList faturas={faturas} onDeletar={deletar} />
+      )}
     </div>
   )
 }
